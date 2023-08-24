@@ -6,16 +6,12 @@ const Option = require('../models/option');
 exports.createQuestion = async (req, res) => {
   try {
         const { question, options } = req.body;
-        arr_of_option = [];
         const newQuestion = new Question({question});
         options.forEach(async  (element) => {
           const option = new Option({ option:element.option, question: newQuestion._id });
-          newQuestion.options.push(option._id);
-          arr_of_option.push(option._id);
+          newQuestion.option.push(option._id);
         await option.save(); 
-        });
-        console.log(arr_of_option);
-        
+        });        
         await newQuestion.save();
         res.status(201).json(newQuestion);
       } catch (error) {
@@ -29,6 +25,34 @@ exports.createOption = async (req, res) => {
 
 exports.deleteQuestion = async (req, res) => {
   // Implement the logic to delete a question
+  const questionId = req.params.id;
+  try{
+    const question = await Question.findById(questionId);
+    if(question){
+      const options = await Option.find({'question':req.params.id})
+      console.log(options);
+      flag = true;
+      id='';
+      options.forEach(element => {
+        if(options.votes>0){
+          flag = false;
+        }
+      });
+      if(flag){
+        const element = await Question.findByIdAndDelete(req.params.id);
+        await Question.save();
+        res.status(200).json({msg:'Option deleted Successfully',element});
+      }else{
+        res.status(200).json({msg:"question  has more than one votes options so can't deleted",element});
+      }
+    }
+    else{
+      res.status(404).json({msg:"Question not found"});
+    }
+  }
+  catch(err){
+    console.log(err);
+  }
 };
 
 exports.add_option = async(req, res) => {
@@ -39,11 +63,13 @@ exports.add_option = async(req, res) => {
 
 if (question) {
   // Add the new option to the options array
-  question.options.push(req.body);
+  const option = new Option({ option:req.body.option, question: req.params.id });
 
+  question.option.push(req.body);
   // Save the updated question
   await question.save();
-  res.status(201).json({msg:'New option added successfully',question});
+  await option.save();
+  res.status(201).json({msg:'New option added successfully',option});
 
   console.log('New option added successfully');
 } else {

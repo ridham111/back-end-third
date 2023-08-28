@@ -2,6 +2,7 @@
 // controllers/questionController.js
 const Question = require('../models/question');
 const Option = require('../models/option');
+const { options } = require('../routes/questionRoutes');
 
 exports.createQuestion = async (req, res) => {
   try {
@@ -33,17 +34,16 @@ exports.deleteQuestion = async (req, res) => {
       console.log(options);
       flag = true;
       id='';
-      options.forEach(element => {
-        if(options.votes>0){
+      for(const ele of options){
+        if(ele.votes>0){
           flag = false;
         }
-      });
+      }
       if(flag){
         const element = await Question.findByIdAndDelete(req.params.id);
-        await Question.save();
-        res.status(200).json({msg:'Option deleted Successfully',element});
+        res.status(200).json({msg:'question deleted Successfully','Question': element});
       }else{
-        res.status(200).json({msg:"question  has more than one votes options so can't deleted",element});
+        res.status(200).json({msg:"question  has more than one votes options so can't deleted",questionId});
       }
     }
     else{
@@ -79,12 +79,18 @@ if (question) {
 
 exports.viewQuestion = async (req, res) => {
   try {
+    let newOption=[];
     const questionId = req.params.id;
     const question = await Question.findById(questionId);
+    const option = await Option.find({question:questionId})
+    for( let ele of option){
+      const link_to_vote = `http://localhost:3000/options/${ele._id}/add_vote`;
+      newOption.push({option:ele,link_to_vote})
+      }
     if (!question) {
       return res.status(404).json({ error: 'Question not found' });
     }
-    res.status(200).json(question);
+    res.status(200).json({msg:'question get successfully', question: question.question,options:newOption});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred' });
@@ -94,8 +100,18 @@ exports.viewQuestion = async (req, res) => {
 // Controller function to view all questions
 exports.viewAllQuestions = async (req, res) => {
   try {
+    newarr=[];
+    newOption=[];
     const questions = await Question.find();
-    res.status(200).json(questions);
+    for(let ele of questions){
+      const options = await Option.find({question:ele._id})
+      for( let ele of options){
+        const link_to_vote = `http://localhost:3000/options/${ele._id}/add_vote`;
+        newOption.push({options:ele,link_to_vote})
+      }
+      newarr.push({question:ele.question,options:newOption})
+    }
+    res.status(200).json(newarr);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred' });

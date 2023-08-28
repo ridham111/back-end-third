@@ -12,13 +12,11 @@ router.post('/:questionId/add_option', async (req, res) => {
     res.status(201).json(newOption);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'An error occurred' });
   }
 });
 
 router.delete('/:id/delete',optionController.deleteOption);
 
-router.post('/:id/add_vote',optionController.add_vote);
-// ... Add more routes as needed (e.g., delete an option, view options, etc.)
+router.put('/:id/add_vote',optionController.add_vote);
 
 module.exports = router;

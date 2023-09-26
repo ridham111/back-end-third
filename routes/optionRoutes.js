@@ -17,6 +17,6 @@ router.post('/:questionId/add_option', async (req, res) => {
 
 router.delete('/:id/delete',optionController.deleteOption);
 
-router.put('/:id/add_vote',optionController.add_vote);
+router.get('/:id/add_vote',optionController.add_vote);
 
 module.exports = router;

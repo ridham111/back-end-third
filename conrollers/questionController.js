@@ -106,7 +106,7 @@ exports.viewAllQuestions = async (req, res) => {
     for(let ele of questions){
       const options = await Option.find({question:ele._id})
       for( let ele of options){
-        const link_to_vote = `http://localhost:3000/options/${ele._id}/add_vote`;
+        const link_to_vote = `http://18.190.28.9:3000/options/${ele._id}/add_vote`;
         newOption.push({options:ele,link_to_vote})
       }
       newarr.push({question:ele.question,options:newOption})

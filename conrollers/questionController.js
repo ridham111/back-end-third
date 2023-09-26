@@ -84,7 +84,7 @@ exports.viewQuestion = async (req, res) => {
     const question = await Question.findById(questionId);
     const option = await Option.find({question:questionId})
     for( let ele of option){
-      const link_to_vote = `http://localhost:3000/options/${ele._id}/add_vote`;
+      const link_to_vote = `http://18.190.28.9:3000/options/${ele._id}/add_vote`;
       newOption.push({option:ele,link_to_vote})
       }
     if (!question) {
